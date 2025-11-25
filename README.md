@@ -91,7 +91,7 @@ To use the CI/CD pipelines, you must configure the following **GitHub Secrets**:
 | `DIGITALOCEAN_TOKEN` | API Token for DigitalOcean. Permissions: all(droplet,registry,firewall), read/write(spaces), read(region). |
 | `AWS_ACCESS_KEY_ID` | **Access Key for the DigitalOcean Space**. Although named `AWS_...` (due to S3 compatibility), this is your DigitalOcean Spaces Access Key. |
 | `AWS_SECRET_ACCESS_KEY` | **Secret Key for the DigitalOcean Space**. This is your DigitalOcean Spaces Secret Key. |
-| `HOST` | IP Address of the Droplet (for deployment). |
+| `HOST` | IP Address of the Droplet (must be added before the app first deployment). |
 | `USERNAME` | SSH Username (root). |
 | `SSH_KEY_DO` | Private SSH Key for accessing the Droplet. |
 | `PASSPHRASE` | Passphrase for the SSH Key (if applicable). |
