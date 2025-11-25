@@ -9,7 +9,9 @@ resource "digitalocean_droplet" "main" {
   size     = "s-1vcpu-1gb"
   backups  = false
   ssh_keys = [data.digitalocean_ssh_key.main.id]
-  user_data = file("cloud-init.yaml")
+  user_data = templatefile("cloud-init.yaml", {
+    deploy_script = file("deploy.sh")
+  })
 }
 
 resource "digitalocean_firewall" "main" {
