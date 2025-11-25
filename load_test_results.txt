@@ -1,0 +1,236 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: infra/load_test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 100 max VUs, 1m30s max duration (incl. graceful stop):
+              * trading_spike: 20.00 iterations/s for 1m0s (maxVUs: 50-100, gracefulStop: 30s)
+
+
+running (0m01.0s), 015/050 VUs, 5 complete and 0 interrupted iterations
+trading_spike   [   2% ] 015/050 VUs  0m01.0s/1m0s  20.00 iters/s
+
+running (0m02.0s), 015/050 VUs, 25 complete and 0 interrupted iterations
+trading_spike   [   3% ] 015/050 VUs  0m02.0s/1m0s  20.00 iters/s
+
+running (0m03.0s), 010/050 VUs, 50 complete and 0 interrupted iterations
+trading_spike   [   5% ] 010/050 VUs  0m03.0s/1m0s  20.00 iters/s
+
+running (0m04.0s), 005/050 VUs, 75 complete and 0 interrupted iterations
+trading_spike   [   7% ] 005/050 VUs  0m04.0s/1m0s  20.00 iters/s
+
+running (0m05.0s), 004/050 VUs, 96 complete and 0 interrupted iterations
+trading_spike   [   8% ] 004/050 VUs  0m05.0s/1m0s  20.00 iters/s
+
+running (0m06.0s), 004/050 VUs, 116 complete and 0 interrupted iterations
+trading_spike   [  10% ] 004/050 VUs  0m06.0s/1m0s  20.00 iters/s
+
+running (0m07.0s), 004/050 VUs, 136 complete and 0 interrupted iterations
+trading_spike   [  12% ] 004/050 VUs  0m07.0s/1m0s  20.00 iters/s
+
+running (0m08.0s), 004/050 VUs, 156 complete and 0 interrupted iterations
+trading_spike   [  13% ] 004/050 VUs  0m08.0s/1m0s  20.00 iters/s
+
+running (0m09.0s), 005/050 VUs, 175 complete and 0 interrupted iterations
+trading_spike   [  15% ] 005/050 VUs  0m09.0s/1m0s  20.00 iters/s
+
+running (0m10.0s), 004/050 VUs, 196 complete and 0 interrupted iterations
+trading_spike   [  17% ] 004/050 VUs  0m10.0s/1m0s  20.00 iters/s
+
+running (0m11.0s), 005/050 VUs, 215 complete and 0 interrupted iterations
+trading_spike   [  18% ] 005/050 VUs  0m11.0s/1m0s  20.00 iters/s
+
+running (0m12.0s), 004/050 VUs, 236 complete and 0 interrupted iterations
+trading_spike   [  20% ] 004/050 VUs  0m12.0s/1m0s  20.00 iters/s
+
+running (0m13.0s), 004/050 VUs, 256 complete and 0 interrupted iterations
+trading_spike   [  22% ] 004/050 VUs  0m13.0s/1m0s  20.00 iters/s
+
+running (0m14.0s), 005/050 VUs, 275 complete and 0 interrupted iterations
+trading_spike   [  23% ] 005/050 VUs  0m14.0s/1m0s  20.00 iters/s
+
+running (0m15.0s), 004/050 VUs, 296 complete and 0 interrupted iterations
+trading_spike   [  25% ] 004/050 VUs  0m15.0s/1m0s  20.00 iters/s
+
+running (0m16.0s), 005/050 VUs, 315 complete and 0 interrupted iterations
+trading_spike   [  27% ] 005/050 VUs  0m16.0s/1m0s  20.00 iters/s
+
+running (0m17.0s), 005/050 VUs, 335 complete and 0 interrupted iterations
+trading_spike   [  28% ] 005/050 VUs  0m17.0s/1m0s  20.00 iters/s
+
+running (0m18.0s), 005/050 VUs, 355 complete and 0 interrupted iterations
+trading_spike   [  30% ] 005/050 VUs  0m18.0s/1m0s  20.00 iters/s
+
+running (0m19.0s), 005/050 VUs, 375 complete and 0 interrupted iterations
+trading_spike   [  32% ] 005/050 VUs  0m19.0s/1m0s  20.00 iters/s
+
+running (0m20.0s), 004/050 VUs, 396 complete and 0 interrupted iterations
+trading_spike   [  33% ] 004/050 VUs  0m20.0s/1m0s  20.00 iters/s
+
+running (0m21.0s), 005/050 VUs, 415 complete and 0 interrupted iterations
+trading_spike   [  35% ] 005/050 VUs  0m21.0s/1m0s  20.00 iters/s
+
+running (0m22.0s), 004/050 VUs, 436 complete and 0 interrupted iterations
+trading_spike   [  37% ] 004/050 VUs  0m22.0s/1m0s  20.00 iters/s
+
+running (0m23.0s), 005/050 VUs, 455 complete and 0 interrupted iterations
+trading_spike   [  38% ] 005/050 VUs  0m23.0s/1m0s  20.00 iters/s
+
+running (0m24.0s), 005/050 VUs, 475 complete and 0 interrupted iterations
+trading_spike   [  40% ] 005/050 VUs  0m24.0s/1m0s  20.00 iters/s
+
+running (0m25.0s), 004/050 VUs, 496 complete and 0 interrupted iterations
+trading_spike   [  42% ] 004/050 VUs  0m25.0s/1m0s  20.00 iters/s
+
+running (0m26.0s), 004/050 VUs, 516 complete and 0 interrupted iterations
+trading_spike   [  43% ] 004/050 VUs  0m26.0s/1m0s  20.00 iters/s
+
+running (0m27.0s), 004/050 VUs, 536 complete and 0 interrupted iterations
+trading_spike   [  45% ] 004/050 VUs  0m27.0s/1m0s  20.00 iters/s
+
+running (0m28.0s), 005/050 VUs, 555 complete and 0 interrupted iterations
+trading_spike   [  47% ] 005/050 VUs  0m28.0s/1m0s  20.00 iters/s
+
+running (0m29.0s), 005/050 VUs, 575 complete and 0 interrupted iterations
+trading_spike   [  48% ] 005/050 VUs  0m29.0s/1m0s  20.00 iters/s
+
+running (0m30.0s), 004/050 VUs, 596 complete and 0 interrupted iterations
+trading_spike   [  50% ] 004/050 VUs  0m30.0s/1m0s  20.00 iters/s
+
+running (0m31.0s), 004/050 VUs, 616 complete and 0 interrupted iterations
+trading_spike   [  52% ] 004/050 VUs  0m31.0s/1m0s  20.00 iters/s
+
+running (0m32.0s), 004/050 VUs, 636 complete and 0 interrupted iterations
+trading_spike   [  53% ] 004/050 VUs  0m32.0s/1m0s  20.00 iters/s
+
+running (0m33.0s), 005/050 VUs, 655 complete and 0 interrupted iterations
+trading_spike   [  55% ] 005/050 VUs  0m33.0s/1m0s  20.00 iters/s
+
+running (0m34.0s), 005/050 VUs, 675 complete and 0 interrupted iterations
+trading_spike   [  57% ] 005/050 VUs  0m34.0s/1m0s  20.00 iters/s
+
+running (0m35.0s), 004/050 VUs, 696 complete and 0 interrupted iterations
+trading_spike   [  58% ] 004/050 VUs  0m35.0s/1m0s  20.00 iters/s
+
+running (0m36.0s), 004/050 VUs, 716 complete and 0 interrupted iterations
+trading_spike   [  60% ] 004/050 VUs  0m36.0s/1m0s  20.00 iters/s
+
+running (0m37.0s), 004/050 VUs, 736 complete and 0 interrupted iterations
+trading_spike   [  62% ] 004/050 VUs  0m37.0s/1m0s  20.00 iters/s
+
+running (0m38.0s), 005/050 VUs, 755 complete and 0 interrupted iterations
+trading_spike   [  63% ] 005/050 VUs  0m38.0s/1m0s  20.00 iters/s
+
+running (0m39.0s), 005/050 VUs, 775 complete and 0 interrupted iterations
+trading_spike   [  65% ] 005/050 VUs  0m39.0s/1m0s  20.00 iters/s
+
+running (0m40.0s), 004/050 VUs, 796 complete and 0 interrupted iterations
+trading_spike   [  67% ] 004/050 VUs  0m40.0s/1m0s  20.00 iters/s
+
+running (0m41.0s), 004/050 VUs, 816 complete and 0 interrupted iterations
+trading_spike   [  68% ] 004/050 VUs  0m41.0s/1m0s  20.00 iters/s
+
+running (0m42.0s), 004/050 VUs, 836 complete and 0 interrupted iterations
+trading_spike   [  70% ] 004/050 VUs  0m42.0s/1m0s  20.00 iters/s
+
+running (0m43.0s), 004/050 VUs, 856 complete and 0 interrupted iterations
+trading_spike   [  72% ] 004/050 VUs  0m43.0s/1m0s  20.00 iters/s
+
+running (0m44.0s), 005/050 VUs, 875 complete and 0 interrupted iterations
+trading_spike   [  73% ] 005/050 VUs  0m44.0s/1m0s  20.00 iters/s
+
+running (0m45.0s), 004/050 VUs, 896 complete and 0 interrupted iterations
+trading_spike   [  75% ] 004/050 VUs  0m45.0s/1m0s  20.00 iters/s
+
+running (0m46.0s), 004/050 VUs, 916 complete and 0 interrupted iterations
+trading_spike   [  77% ] 004/050 VUs  0m46.0s/1m0s  20.00 iters/s
+
+running (0m47.0s), 004/050 VUs, 936 complete and 0 interrupted iterations
+trading_spike   [  78% ] 004/050 VUs  0m47.0s/1m0s  20.00 iters/s
+
+running (0m48.0s), 005/050 VUs, 955 complete and 0 interrupted iterations
+trading_spike   [  80% ] 005/050 VUs  0m48.0s/1m0s  20.00 iters/s
+
+running (0m49.0s), 005/050 VUs, 975 complete and 0 interrupted iterations
+trading_spike   [  82% ] 005/050 VUs  0m49.0s/1m0s  20.00 iters/s
+
+running (0m50.0s), 005/050 VUs, 995 complete and 0 interrupted iterations
+trading_spike   [  83% ] 005/050 VUs  0m50.0s/1m0s  20.00 iters/s
+
+running (0m51.0s), 004/050 VUs, 1016 complete and 0 interrupted iterations
+trading_spike   [  85% ] 004/050 VUs  0m51.0s/1m0s  20.00 iters/s
+
+running (0m52.0s), 004/050 VUs, 1036 complete and 0 interrupted iterations
+trading_spike   [  87% ] 004/050 VUs  0m52.0s/1m0s  20.00 iters/s
+
+running (0m53.0s), 005/050 VUs, 1055 complete and 0 interrupted iterations
+trading_spike   [  88% ] 005/050 VUs  0m53.0s/1m0s  20.00 iters/s
+
+running (0m54.0s), 005/050 VUs, 1075 complete and 0 interrupted iterations
+trading_spike   [  90% ] 005/050 VUs  0m54.0s/1m0s  20.00 iters/s
+
+running (0m55.0s), 005/050 VUs, 1095 complete and 0 interrupted iterations
+trading_spike   [  92% ] 005/050 VUs  0m55.0s/1m0s  20.00 iters/s
+
+running (0m56.0s), 004/050 VUs, 1116 complete and 0 interrupted iterations
+trading_spike   [  93% ] 004/050 VUs  0m56.0s/1m0s  20.00 iters/s
+
+running (0m57.0s), 004/050 VUs, 1136 complete and 0 interrupted iterations
+trading_spike   [  95% ] 004/050 VUs  0m57.0s/1m0s  20.00 iters/s
+
+running (0m58.0s), 004/050 VUs, 1156 complete and 0 interrupted iterations
+trading_spike   [  97% ] 004/050 VUs  0m58.0s/1m0s  20.00 iters/s
+
+running (0m59.0s), 005/050 VUs, 1175 complete and 0 interrupted iterations
+trading_spike   [  98% ] 005/050 VUs  0m59.0s/1m0s  20.00 iters/s
+
+running (1m00.0s), 005/050 VUs, 1195 complete and 0 interrupted iterations
+trading_spike   [ 100% ] 005/050 VUs  1m00.0s/1m0s  20.00 iters/s
+time="2025-11-26T04:03:12+08:00" level=error msg="ReferenceError: textSummary is not defined\n\tat handleSummary (file:///Users/weslley/pyron-infra/infra/load_test.js:52:26(9))\n" hint="script exception"
+
+
+  █ THRESHOLDS 
+
+    http_req_duration
+    ✓ 'p(95)<600' p(95)=291.89ms
+    ✓ 'avg<300' avg=245.26ms
+
+    http_req_failed
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 1200    19.921014/s
+    checks_succeeded...: 100.00% 1200 out of 1200
+    checks_failed......: 0.00%   0 out of 1200
+
+    ✓ is status 202
+
+    HTTP
+    http_req_duration..............: avg=245.26ms min=202.24ms med=210.8ms  max=328.48ms p(90)=290.93ms p(95)=291.89ms
+      { expected_response:true }...: avg=245.26ms min=202.24ms med=210.8ms  max=328.48ms p(90)=290.93ms p(95)=291.89ms
+    http_req_failed................: 0.00%  0 out of 1200
+    http_reqs......................: 1200   19.921014/s
+
+    EXECUTION
+    iteration_duration.............: avg=266.1ms  min=202.37ms med=211.42ms max=878.7ms  p(90)=291.95ms p(95)=293.91ms
+    iterations.....................: 1200   19.921014/s
+    vus............................: 5      min=4         max=15
+    vus_max........................: 50     min=50        max=50
+
+    NETWORK
+    data_received..................: 697 kB 12 kB/s
+    data_sent......................: 294 kB 4.9 kB/s
+
+
+
+
+running (1m00.2s), 000/050 VUs, 1200 complete and 0 interrupted iterations
+trading_spike ✓ [ 100% ] 000/050 VUs  1m0s  20.00 iters/s
