@@ -28,6 +28,29 @@ if [ -f "$CONFIG_FILE" ] && grep -q "first-run=true" "$CONFIG_FILE"; then
         
         NGINX_CONFIG="/etc/nginx/sites-available/$HOSTNAME"
 
+        # 1. Configure HTTP only first to allow Certbot validation
+        cat > "$NGINX_CONFIG" <<EOF
+server {
+    listen 80;
+    listen [::]:80;
+    server_name $HOSTNAME;
+    
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+}
+EOF
+        ln -sf "$NGINX_CONFIG" "/etc/nginx/sites-enabled/$HOSTNAME"
+        nginx -t && systemctl reload nginx
+
+        # 2. Obtain SSL certificate
+        echo "Obtaining SSL certificate with Certbot..."
+        certbot certonly --nginx -d "$HOSTNAME" --non-interactive --agree-tos -m admin@$HOSTNAME
+
+        # 3. Write full hardened HTTPS config
         cat > "$NGINX_CONFIG" <<EOF
 server {
     listen 80 default_server;
@@ -113,15 +136,12 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         
+        # CRITICAL: Tell FastAPI we are using HTTPS
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
 EOF
-        ln -sf "$NGINX_CONFIG" "/etc/nginx/sites-enabled/$HOSTNAME"
         nginx -t && systemctl reload nginx
-
-        echo "Obtaining SSL certificate with Certbot..."
-        certbot --nginx -d "$HOSTNAME" --non-interactive --agree-tos -m admin@$HOSTNAME --redirect
     else
         echo "HOSTNAME is not set. Configuring for IP with self-signed certificate..."
         
