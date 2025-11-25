@@ -37,10 +37,9 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: app
-          tags: pyron-api:${{ github.sha }}
+          tags: registry.digitalocean.com/pyron-api-lon1/pyron-api:${{ github.sha }}
       - name: Login to Container Registry...
         run: doctl registry login
       - name: Tagging and Pushing...
         run: | 
-          docker tag pyron-api:${{ github.sha }} registry.digitalocean.com/pyron-api-lon1/$TAG
-          docker push registry.digitalocean.com/pyron-api-lon1/$TAG
+          docker push registry.digitalocean.com/pyron-api-lon1/pyron-api:${{ github.sha }}
