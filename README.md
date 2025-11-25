@@ -26,6 +26,22 @@ The infrastructure is managed using **Terraform** and includes:
 -   **Container Registry**: Stores the Docker images for the API and Worker.
 -   **Terraform Backend**: State is stored in a DigitalOcean Space (S3-compatible) for collaboration and safety.
 
+### Terraform Configuration
+
+#### Inputs
+
+| Name | Description | Type | Default |
+| :--- | :--- | :--- | :--- |
+| `region` | Region where resources will be provisioned. | `string` | `lon1` |
+| `registry_name` | Name of the registry for API image. | `string` | `pyron-api` |
+| `droplet_name` | Webserver name. | `string` | `pyron-webserver` |
+
+#### Outputs
+
+| Name | Description |
+| :--- | :--- |
+| `droplet_ip` | The public IPv4 address of the provisioned Droplet. |
+
 ### Cloud-init
 The `infra/cloud-init.yaml` file configures the Droplet upon creation, ensuring that:
 -   System packages are updated and upgraded.
@@ -108,6 +124,8 @@ To run the application locally:
 
 ### Load Testing
 
+
+#### Run Load Test
 1.  **Prerequisites**: k6.
 2.  **Run**:
     ```bash
@@ -118,7 +136,39 @@ To run the application locally:
     cat load_test_results.txt
     cat stats.json
     ```
-Note: My Average latency is around 250ms, but I believe that is due the fact I'm at Bali, the server is in London, so I believe when you run the test by yourself, you will get a lower latency.
+
+#### Description of Load-Testing Method
+Tooling: The load test was conducted using k6, a modern open-source load-testing tool chosen for its precision in defining request rates and its low resource footprint.
+
+Scenario Configuration: To strictly validate the requirement of sustaining 1,000 requests per minute (~16.6 RPS), I utilized the constant-arrival-rate executor. Unlike standard virtual user loops, this executor attempts to start a fixed number of iterations per second regardless of the system's response time, providing a true stress test of throughput.
+
+- Target Rate: 20 RPS (1,200 requests/minute) — Set 20% higher than the requirement to demonstrate capacity.
+- Duration: 1 minute sustained load.
+- Payload: Full JSON structure compliant with the Pydantic schema (ticker, action, price, timestamp).
+- Environment: The test was executed externally (WAN) targeting the DigitalOcean Droplet in the lon1 (London) region to simulate real-world network conditions.
+
+Success Criteria (Thresholds): The test was configured to fail automatically if:
+1. Error Rate: > 0% (Target: 0 failures).
+2. p95 Latency: > 600ms.
+3. Average Latency: > 300ms.
+
+**Performance Engineering Notes:**
+To achieve the target latency (<300ms) and throughput while ensuring zero data loss, I implemented an Asynchronous Producer-Consumer Architecture. This design decouples the high-frequency ingestion layer from the slower database write layer.
+Key Techniques Implemented:
+1. Asynchronous I/O (Non-Blocking):
+    - Utilized FastAPI (running on Uvicorn), which leverages the Python asyncio event loop. This allows the web server to handle hundreds of concurrent connections on a single thread without blocking while waiting for I/O operations (like network calls to Redis).
+    - Enabled HTTP/2 on Nginx to multiplex requests efficiently.
+2. Queuing (The "Buffer" Strategy):
+    - Instead of writing synchronously to MongoDB (which is disk I/O bound and slower), the webhook endpoint validates the payload and pushes it immediately to a Redis List (In-memory, sub-millisecond write latency).
+    - The API returns 202 Accepted immediately after the Redis write. This guarantees that the HTTP response time remains flat and predictable, regardless of the load on the database.
+3. Resource Pooling:
+    - Implemented global connection pools for both Redis (redis-py) and MongoDB (motor). This eliminates the significant TCP handshake overhead that would occur if a new connection were opened for every single webhook request.
+4. Background Processing:
+    - A dedicated Worker Service consumes messages from the Redis queue using blocking pop (BLPOP) and batches writes to MongoDB. This ensures that even if traffic spikes to 5x normal load, the webhooks remain fast; the queue simply grows temporarily until the worker catches up.
+5. Infrastructure Tuning:
+    - Nginx Reverse Proxy: Tuned with keepalive_timeout and specific buffer sizes to handle high-throughput JSON payloads efficiently while terminating SSL securely.
+
+OBS: My Average latency is around 250ms, but I believe that is due the fact I'm at Bali, the server is in London, so I believe when you run the test by yourself, you will get a lower latency.
 
 
 
