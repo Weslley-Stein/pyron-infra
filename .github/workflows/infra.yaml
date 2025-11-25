@@ -63,7 +63,13 @@ jobs:
         run: s3cmd get s3://pyron-terraform/ --recursive
       - name: Initializing project...
         run: terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: Formatting and validating...
         run: terraform fmt && terraform validate
       - name: Applying...
         run: terraform apply -input=false --auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
