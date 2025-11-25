@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     endpoints = {
-      s3 = "https://pyron-terraform.sfo3.digitaloceanspaces.com"
+      s3 = "https://sfo3.digitaloceanspaces.com"
     }
 
     bucket = "pyron-terraform"
