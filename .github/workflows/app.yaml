@@ -10,6 +10,7 @@ on:
     paths:
       - "app/**" 
       - ".github/workflows/app.yaml"
+      - "infra/docker-compose.yaml"
   workflow_dispatch:
 
 jobs:
