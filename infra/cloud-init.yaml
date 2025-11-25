@@ -8,6 +8,14 @@ packages:
   - certbot
   - python3-certbot-nginx
 
+write_files:
+  - path: /etc/pyron/configure-server
+    content: |
+      first-run=true
+  - path: /root/deploy.sh
+    permissions: '0755'
+    content: |
+      ${indent(6, deploy_script)}
+
 runcmd:
-  - systemctl enable --now docker
-  - systemctl enable --now nginx
+  - /root/deploy.sh
