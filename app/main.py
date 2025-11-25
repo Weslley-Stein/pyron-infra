@@ -1,8 +1,9 @@
 from fastapi import FastAPI
+from fastapi.middleware.proxy_headers import ProxyHeadersMiddleware
 from app.api.v1.router import api_router
 
 app = FastAPI(title="Pyron Infra")
-
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=["*"])
 app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/health")
