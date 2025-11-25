@@ -3,11 +3,11 @@ on:
   push:
       branches: [master] 
       paths:
-        - "infra/*" 
+        - "infra/**" 
   pull_request:
       branches: [master]
       paths:
-        - "infra/*" 
+        - "infra/**" 
 
 
 jobs:
