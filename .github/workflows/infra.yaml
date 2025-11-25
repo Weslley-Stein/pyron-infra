@@ -19,6 +19,8 @@ jobs:
             working-directory: infra/
     env:
       DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+    outputs:
+      print_plan: ${{ steps.print_plan.outputs.print_plan }}
     steps:
       - name: Checking out the code...
         uses: actions/checkout@v4
@@ -33,7 +35,8 @@ jobs:
       - name: Planning...
         run: terraform plan -input=false -out tfplan
       - name: Printing plan...
-        run: terraform show tfplan
+        id: print_plan
+        run: terraform show tfplan >> $"GITHUB_OUTPUT"
   apply:
     runs-on: ubuntu-latest
     if: ${{(github.event_name == 'push' && github.ref_name == 'master') || github.event_name == 'workflow_dispatch' }}
