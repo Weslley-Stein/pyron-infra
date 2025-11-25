@@ -9,7 +9,7 @@ variable "region" {
 }
 
 variable "registry_name" {
-  description = ""
+  description = "pyron-api"
   type        = string
   validation {
     condition     = var.registry_name != ""
@@ -18,7 +18,7 @@ variable "registry_name" {
 }
 
 variable "droplet_name" {
-  description = ""
+  description = "pyron-webserver"
   type        = string
   validation {
     condition     = var.droplet_name != ""
