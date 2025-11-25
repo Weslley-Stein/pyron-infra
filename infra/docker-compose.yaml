@@ -1,0 +1,41 @@
+services:
+  app:
+    image: pyron_api
+    container_name: pyron_api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - MONGO_URL=mongodb://mongo:27017
+    depends_on:
+      - redis
+      - mongo
+    networks:
+      - pyron-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: pyron_redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - pyron-net
+
+  mongo:
+    image: mongo:6.0
+    container_name: pyron_mongo
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - pyron-net
+
+volumes:
+  redis_data:
+  mongo_data:
+
+networks:
+  pyron-net:
+    driver: bridge
