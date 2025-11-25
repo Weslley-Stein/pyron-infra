@@ -5,6 +5,9 @@ CONFIG_FILE="/etc/pyron/configure-server"
 if [ -f "$CONFIG_FILE" ] && grep -q "first-run=true" "$CONFIG_FILE"; then
     echo "First run detected. Configuring server..."
 
+    # Create deployment directory
+    mkdir -p /root/pyron-app
+
     echo "Updating packages..."
     apt update -y && apt upgrade -y
 
