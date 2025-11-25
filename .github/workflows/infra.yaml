@@ -9,6 +9,9 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     if: ${{github.event_name}} == "pull_request"
+    defaults:
+          run:
+            working-directory: infra/
     env:
       DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
     steps:
