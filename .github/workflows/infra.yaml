@@ -1,9 +1,14 @@
 name: Pyron Infra
 on:
   push:
-      branches: [master]
+      branches: [master] 
+      paths:
+        - "infra/*" 
   pull_request:
       branches: [master]
+      paths:
+        - "infra/*" 
+
 
 jobs:
   plan:
