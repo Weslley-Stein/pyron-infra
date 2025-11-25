@@ -3,11 +3,11 @@ data "digitalocean_ssh_key" "main" {
 }
 
 resource "digitalocean_droplet" "main" {
-  image   = "ubuntu-20-04-x64"
-  name    = var.droplet_name
-  region  = var.region
-  size    = "s-1vcpu-1gb"
-  backups = false
+  image    = "ubuntu-20-04-x64"
+  name     = var.droplet_name
+  region   = var.region
+  size     = "s-1vcpu-1gb"
+  backups  = false
   ssh_keys = [data.digitalocean_ssh_key.main.id]
 }
 
@@ -27,7 +27,7 @@ resource "digitalocean_firewall" "main" {
     port_range       = "443"
     source_addresses = ["0.0.0.0/0", "::/0"]
   }
-  
+
   # Enabled temporarely in case ACME Challenge needs it.
   inbound_rule {
     protocol         = "tcp"
@@ -40,7 +40,7 @@ resource "digitalocean_firewall" "main" {
     port_range            = "1-65535"
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
-  
+
   outbound_rule {
     protocol              = "udp"
     port_range            = "1-65535"
