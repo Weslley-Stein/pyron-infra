@@ -10,10 +10,12 @@ on:
     paths:
       - "app/**" 
       - ".github/workflows/app.yaml"
+      - "infra/docker-compose.yaml"
   workflow_dispatch:
 
 jobs:
   build_and_publish:
+    name: Build and Publish
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: registry.digitalocean.com/pyron-api-lon1/pyron-api
@@ -54,7 +56,7 @@ jobs:
           source: "infra/docker-compose.yaml"
           target: "/root/pyron-app"
           strip_components: 1
-      - name: Execute remote deployment
+      - name: Executing remote deployment...
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HOST }}

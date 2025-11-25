@@ -1,7 +1,7 @@
+version: '3.8'
 services:
-  app:
-    image: registry.digitalocean.com/pyron-api-lon1:${TAG}
-    container_name: pyron_api
+  api:
+    image: registry.digitalocean.com/pyron-api-lon1/pyron-api:${TAG}
     restart: always
     ports:
       - "127.0.0.1:8000:8000"
@@ -14,27 +14,30 @@ services:
     networks:
       - pyron-net
 
+  worker:
+    image: registry.digitalocean.com/pyron-api-lon1/pyron-api:${TAG}
+    restart: always
+    command: ["python", "app/worker.py"]
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - MONGO_URL=mongodb://mongo:27017
+    depends_on:
+      - redis
+      - mongo
+    networks:
+      - pyron-net
+
   redis:
     image: redis:7-alpine
-    container_name: pyron_redis
     restart: always
-    volumes:
-      - redis_data:/data
     networks:
       - pyron-net
 
   mongo:
     image: mongo:6.0
-    container_name: pyron_mongo
     restart: always
-    volumes:
-      - mongo_data:/data/db
     networks:
       - pyron-net
-
-volumes:
-  redis_data:
-  mongo_data:
 
 networks:
   pyron-net:
