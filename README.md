@@ -97,6 +97,18 @@ To use the CI/CD pipelines, you must configure the following **GitHub Secrets**:
 | `PASSPHRASE` | Passphrase for the SSH Key (if applicable). |
 | `HOSTNAME` | Domain name of the Droplet (optional). |
 
+## DNS Setup & SSL
+
+The provisioning process is designed to be robust even if your DNS records are not yet pointing to the Droplet.
+
+1.  **Initial Provisioning**: Terraform will create the Droplet. If the domain (`HOSTNAME`) does not resolve to the Droplet's IP, the server will configure itself with a **Self-Signed Certificate**.
+2.  **Point DNS**: Go to your DNS provider and create an **A record** pointing your domain to the `droplet_ip` output by Terraform.
+3.  **Finalize Setup**: Once DNS has propagated (verify with `dig +short your-domain.com`), SSH into the server and re-run the deploy script to obtain a valid Let's Encrypt certificate:
+    ```bash
+    ssh root@<droplet_ip>
+    /root/deploy.sh --force
+    ```
+
 ## Local Development
 
 To run the application locally:

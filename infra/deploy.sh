@@ -2,37 +2,74 @@
 
 CONFIG_FILE="/etc/pyron/configure-server"
 
-if [ -f "$CONFIG_FILE" ] && grep -q "first-run=true" "$CONFIG_FILE"; then
-    echo "First run detected. Configuring server..."
-
-    # Create deployment directory
-    mkdir -p /root/pyron-app
-
-    echo "Updating packages..."
-    apt update -y && apt upgrade -y
-
-    echo "Enabling services..."
-    systemctl enable --now docker
-    systemctl enable --now nginx
-
-    echo "Configuring nginx..."
-    # Fix: Correct path for sites-available
-    rm -f /etc/nginx/sites-available/default
-    rm -f /etc/nginx/sites-enabled/default
-
-    # Generate dhparam.pem if it doesn't exist (needed for both modes)
-    if [ ! -f /etc/nginx/dhparam.pem ]; then
-        echo "Generating dhparam.pem..."
-        openssl dhparam -out /etc/nginx/dhparam.pem 2048
+# Function to check if script should run
+should_run() {
+    if [ -f "$CONFIG_FILE" ] && grep -q "first-run=true" "$CONFIG_FILE"; then
+        return 0
     fi
-    
-    if [ -n "$HOSTNAME" ]; then
-        echo "HOSTNAME is set to $HOSTNAME. Configuring for domain..."
-        
-        NGINX_CONFIG="/etc/nginx/sites-available/$HOSTNAME"
+    # Allow manual re-run if argument is provided
+    if [ "$1" == "--force" ]; then
+        return 0
+    fi
+    # Check if we are in a "self-signed" state but want "real certs"
+    if [ -n "$HOSTNAME" ] && [ -f "/etc/nginx/ssl/selfsigned.crt" ]; then
+        echo "Hostname set but using self-signed certs. Checking if we can upgrade..."
+        return 0
+    fi
+    return 1
+}
 
-        # 1. Configure HTTP only first to allow Certbot validation
-        cat > "$NGINX_CONFIG" <<EOF
+echo "Starting deployment script..."
+
+# Always ensure packages are installed (idempotent)
+echo "Updating packages..."
+apt update -y && apt upgrade -y
+apt install -y docker.io nginx certbot python3-certbot-nginx dnsutils
+
+echo "Enabling services..."
+systemctl enable --now docker
+systemctl enable --now nginx
+
+# Create deployment directory
+mkdir -p /root/pyron-app
+
+echo "Configuring nginx..."
+# Fix: Correct path for sites-available
+rm -f /etc/nginx/sites-available/default
+rm -f /etc/nginx/sites-enabled/default
+
+# Generate dhparam.pem if it doesn't exist (needed for both modes)
+if [ ! -f /etc/nginx/dhparam.pem ]; then
+    echo "Generating dhparam.pem..."
+    openssl dhparam -out /etc/nginx/dhparam.pem 2048
+fi
+
+# Get Public IP
+PUBLIC_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address)
+echo "Public IP: $PUBLIC_IP"
+
+DOMAIN_RESOLVES=false
+
+if [ -n "$HOSTNAME" ]; then
+    echo "HOSTNAME is set to $HOSTNAME."
+    RESOLVED_IP=$(dig +short "$HOSTNAME" | tail -n1)
+    echo "Resolved IP for $HOSTNAME: $RESOLVED_IP"
+    
+    if [ "$RESOLVED_IP" == "$PUBLIC_IP" ]; then
+        echo "DNS matches Public IP. Proceeding with Certbot..."
+        DOMAIN_RESOLVES=true
+    else
+        echo "WARNING: DNS ($RESOLVED_IP) does not match Public IP ($PUBLIC_IP). Falling back to Self-Signed Certificate."
+    fi
+fi
+
+if [ "$DOMAIN_RESOLVES" = true ]; then
+    echo "Configuring for domain $HOSTNAME..."
+    
+    NGINX_CONFIG="/etc/nginx/sites-available/$HOSTNAME"
+
+    # 1. Configure HTTP only first to allow Certbot validation
+    cat > "$NGINX_CONFIG" <<EOF
 server {
     listen 80;
     listen [::]:80;
@@ -46,13 +83,15 @@ server {
     }
 }
 EOF
-        ln -sf "$NGINX_CONFIG" "/etc/nginx/sites-enabled/$HOSTNAME"
-        nginx -t && systemctl reload nginx
+    ln -sf "$NGINX_CONFIG" "/etc/nginx/sites-enabled/$HOSTNAME"
+    # Remove default/self-signed config if it exists
+    rm -f /etc/nginx/sites-enabled/default
+    
+    nginx -t && systemctl reload nginx
 
-        # 2. Obtain SSL certificate
-        echo "Obtaining SSL certificate with Certbot..."
-        certbot certonly --nginx -d "$HOSTNAME" --non-interactive --agree-tos -m admin@$HOSTNAME
-
+    # 2. Obtain SSL certificate
+    echo "Obtaining SSL certificate with Certbot..."
+    if certbot certonly --nginx -d "$HOSTNAME" --non-interactive --agree-tos -m admin@$HOSTNAME; then
         # 3. Write full hardened HTTPS config
         cat > "$NGINX_CONFIG" <<EOF
 server {
@@ -145,19 +184,25 @@ server {
 }
 EOF
         nginx -t && systemctl reload nginx
-    else
-        echo "HOSTNAME is not set. Configuring for IP with self-signed certificate..."
         
-        # Generate self-signed certificate
-        mkdir -p /etc/nginx/ssl
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-            -keyout /etc/nginx/ssl/selfsigned.key \
-            -out /etc/nginx/ssl/selfsigned.crt \
-            -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
+        # Cleanup self-signed if it exists
+        rm -f /etc/nginx/sites-enabled/default
+    else
+        echo "Certbot failed. Keeping previous configuration."
+    fi
+else
+    echo "Configuring for IP with self-signed certificate (Fallback)..."
+    
+    # Generate self-signed certificate
+    mkdir -p /etc/nginx/ssl
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /etc/nginx/ssl/selfsigned.key \
+        -out /etc/nginx/ssl/selfsigned.crt \
+        -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
 
-        NGINX_CONFIG="/etc/nginx/sites-available/default"
+    NGINX_CONFIG="/etc/nginx/sites-available/default"
 
-        cat > "$NGINX_CONFIG" <<EOF
+    cat > "$NGINX_CONFIG" <<EOF
 server {
     listen 80;
     server_name _;
@@ -216,13 +261,10 @@ server {
     }
 }
 EOF
-        ln -sf "$NGINX_CONFIG" /etc/nginx/sites-enabled/default
-        nginx -t && systemctl reload nginx
-    fi
-
-    # Update config file to prevent re-execution
-    sed -i 's/first-run=true/first-run=false/' "$CONFIG_FILE"
-    echo "Configuration complete."
-else
-    echo "Not first run or config file missing. Skipping configuration."
+    ln -sf "$NGINX_CONFIG" /etc/nginx/sites-enabled/default
+    nginx -t && systemctl reload nginx
 fi
+
+# Update config file to prevent re-execution
+sed -i 's/first-run=true/first-run=false/' "$CONFIG_FILE"
+echo "Configuration complete."
