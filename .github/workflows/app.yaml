@@ -34,13 +34,8 @@ jobs:
       - name: Setting up Docker Buildx...
         uses: docker/setup-buildx-action@v3
       - name: Building...
-        uses: docker/build-push-action@v6
-        with:
-          context: app
-          tags: registry.digitalocean.com/pyron-api-lon1/pyron-api:${{ github.sha }}
-      - name: Login to Container Registry...
-        run: doctl registry login
+        run: docker build -t registry.digitalocean.com/pyron-api-lon1/pyron-api:${{ github.sha }} .
       - name: Tagging and Pushing...
         run: | 
-          docker images
+          docker images &&
           docker push registry.digitalocean.com/pyron-api-lon1/pyron-api:${{ github.sha }}
