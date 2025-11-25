@@ -1,0 +1,29 @@
+name: Pyron Infra
+on:
+  push:
+      branches: [master]
+  pull_request:
+      branches: [master]
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    if: ${{github.event_name}} == "pull_request"
+    env:
+      DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+    steps:
+      - name: Checking out the code...
+        uses: actions/checkout@v4
+      - name: Setting up Terraform...
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.0"
+      - name: Formatting and validating...
+        run: terraform fmt && terraform validate
+      - name: Initializing project...
+        run: terraform init
+      - name: Planning...
+        run: terraform plan -out plan
+
+
+    
