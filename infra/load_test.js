@@ -22,10 +22,12 @@ export default function () {
   const url = 'https://pyron.alwa.ai/api/v1/webhook';
   
   const payload = JSON.stringify({
-    ticker: "BTCUSDT",
-    action: "buy",
-    price: 95000.50,
-    timestamp: new Date().toISOString()
+    payload: {
+      ticker: "BTCUSDT",
+      action: "buy",
+      price: 95000.50,
+      timestamp: new Date().toISOString()
+    }
   });
 
   const params = {
@@ -35,6 +37,10 @@ export default function () {
   };
 
   const res = http.post(url, payload, params);
+
+  if (res.status !== 202) {
+    console.log(`Failed: ${res.status} - ${res.body}`);
+  }
 
   check(res, {
     'is status 202': (r) => r.status === 202,
