@@ -2,16 +2,13 @@
 
 CONFIG_FILE="/etc/pyron/configure-server"
 
-# Function to check if script should run
 should_run() {
     if [ -f "$CONFIG_FILE" ] && grep -q "first-run=true" "$CONFIG_FILE"; then
         return 0
     fi
-    # Allow manual re-run if argument is provided
     if [ "$1" == "--force" ]; then
         return 0
     fi
-    # Check if we are in a "self-signed" state but want "real certs"
     if [ -n "$HOSTNAME" ] && [ -f "/etc/nginx/ssl/selfsigned.crt" ]; then
         echo "Hostname set but using self-signed certs. Checking if we can upgrade..."
         return 0
@@ -19,9 +16,13 @@ should_run() {
     return 1
 }
 
+if ! should_run "$1"; then
+    echo "Skipping configuration. Use --force to override."
+    exit 0
+fi
+
 echo "Starting deployment script..."
 
-# Always ensure packages are installed (idempotent)
 echo "Updating packages..."
 apt update -y && apt upgrade -y
 apt install -y docker.io nginx certbot python3-certbot-nginx dnsutils
@@ -30,21 +31,17 @@ echo "Enabling services..."
 systemctl enable --now docker
 systemctl enable --now nginx
 
-# Create deployment directory
 mkdir -p /root/pyron-app
 
 echo "Configuring nginx..."
-# Fix: Correct path for sites-available
 rm -f /etc/nginx/sites-available/default
 rm -f /etc/nginx/sites-enabled/default
 
-# Generate dhparam.pem if it doesn't exist (needed for both modes)
 if [ ! -f /etc/nginx/dhparam.pem ]; then
     echo "Generating dhparam.pem..."
     openssl dhparam -out /etc/nginx/dhparam.pem 2048
 fi
 
-# Get Public IP
 PUBLIC_IP=$(curl -s http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address)
 echo "Public IP: $PUBLIC_IP"
 
@@ -68,7 +65,6 @@ if [ "$DOMAIN_RESOLVES" = true ]; then
     
     NGINX_CONFIG="/etc/nginx/sites-available/$HOSTNAME"
 
-    # 1. Configure HTTP only first to allow Certbot validation
     cat > "$NGINX_CONFIG" <<EOF
 server {
     listen 80;
@@ -84,15 +80,12 @@ server {
 }
 EOF
     ln -sf "$NGINX_CONFIG" "/etc/nginx/sites-enabled/$HOSTNAME"
-    # Remove default/self-signed config if it exists
     rm -f /etc/nginx/sites-enabled/default
     
     nginx -t && systemctl reload nginx
 
-    # 2. Obtain SSL certificate
     echo "Obtaining SSL certificate with Certbot..."
     if certbot certonly --nginx -d "$HOSTNAME" --non-interactive --agree-tos -m admin@$HOSTNAME; then
-        # 3. Write full hardened HTTPS config
         cat > "$NGINX_CONFIG" <<EOF
 server {
     listen 80 default_server;
@@ -193,7 +186,6 @@ EOF
 else
     echo "Configuring for IP with self-signed certificate (Fallback)..."
     
-    # Generate self-signed certificate
     mkdir -p /etc/nginx/ssl
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
         -keyout /etc/nginx/ssl/selfsigned.key \
@@ -265,6 +257,5 @@ EOF
     nginx -t && systemctl reload nginx
 fi
 
-# Update config file to prevent re-execution
 sed -i 's/first-run=true/first-run=false/' "$CONFIG_FILE"
 echo "Configuration complete."
