@@ -1,5 +1,5 @@
 variable "region" {
-  description = ""
+  description = "Region where resources will be provisioned."
   type        = string
   default     = "lon1"
   validation {
@@ -9,8 +9,9 @@ variable "region" {
 }
 
 variable "registry_name" {
-  description = "pyron-api"
+  description = "Name of the registry for API image."
   type        = string
+  default = "pyron-api"
   validation {
     condition     = var.registry_name != ""
     error_message = "Registry name not specified!"
@@ -18,8 +19,9 @@ variable "registry_name" {
 }
 
 variable "droplet_name" {
-  description = "pyron-webserver"
+  description = "Webserver name."
   type        = string
+  default = "pyron-webserver"
   validation {
     condition     = var.droplet_name != ""
     error_message = "Droplet name not specified!"
