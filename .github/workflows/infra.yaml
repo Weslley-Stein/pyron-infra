@@ -4,10 +4,12 @@ on:
       branches: [master] 
       paths:
         - "infra/**" 
+        - ".github/workflows/infra.yaml"
   pull_request:
       branches: [master]
       paths:
         - "infra/**" 
+        - ".github/workflows/infra.yaml"
   workflow_dispatch:
 
 jobs:
