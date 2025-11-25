@@ -3,7 +3,7 @@ data "digitalocean_ssh_key" "main" {
 }
 
 resource "digitalocean_droplet" "main" {
-  image    = "ubuntu-20-04-x64"
+  image    = "ubuntu-24-04-x64"
   name     = var.droplet_name
   region   = var.region
   size     = "s-1vcpu-1gb"
