@@ -19,6 +19,8 @@ jobs:
             working-directory: infra/
     env:
       DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     outputs:
       print_plan: ${{ steps.print_plan.outputs.print_plan }}
     steps:
@@ -28,12 +30,6 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.14.0"
-      - name: Setting up S3cmd cli tool
-        uses: s3-actions/s3cmd@v2.0.1
-        with:
-          provider: digitalocean
-          access_key: ${{ secrets.SPACES_ACCESS_KEY }}
-          secret_key: ${{ secrets.SPACES_SECRET_KEY }}
       - name: Initializing project...
         run: terraform init
       - name: Formatting and validating...
@@ -48,10 +44,6 @@ jobs:
           echo "$PLAN_OUTPUT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           echo "$PLAN_OUTPUT"
-      - name: Pushing tfplan to space...
-        #run: s3cmd put tfplan s3://pyron-terraform/tfplan
-        run: s3cmd ls
-
   apply:
     runs-on: ubuntu-latest
     if: ${{(github.event_name == 'push' && github.ref_name == 'master') || github.event_name == 'workflow_dispatch' }}
@@ -63,12 +55,6 @@ jobs:
     steps:
       - name: Checking out the code...
         uses: actions/checkout@v4
-      - name: Setting up S3cmd cli tool
-        uses: s3-actions/s3cmd@v2.0.1
-        with:
-          provider: digitalocean
-          access_key: ${{ secrets.SPACES_ACCESS_KEY }}
-          secret_key: ${{ secrets.SPACES_SECRET_KEY }}
       - name: Setting up Terraform...
         uses: hashicorp/setup-terraform@v3
         with:
@@ -80,6 +66,4 @@ jobs:
       - name: Formatting and validating...
         run: terraform fmt && terraform validate
       - name: Applying...
-        run: terraform apply -input=false --auto-approve tfplan
-      - name: Pushing terraform.state to space...
-        run: s3cmd get terraform.tfstate s3://pyron-terraform/terraform.tfstate
+        run: terraform apply -input=false --auto-approve
