@@ -13,7 +13,7 @@ on:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    if: ${{github.event_name}} == "pull_request"
+    if: ${{github.event_name == 'pull_request'}}
     defaults:
           run:
             working-directory: infra/
@@ -31,7 +31,27 @@ jobs:
       - name: Formatting and validating...
         run: terraform fmt && terraform validate
       - name: Planning...
-        run: terraform plan -out plan
-
-
-    
+        run: terraform plan -input=false -out tfplan
+      - name: Printing plan...
+        run: terraform show tfplan
+  apply:
+    runs-on: ubuntu-latest
+    if: ${{github.event_name == 'push' && github.ref_name == 'master'}}
+    defaults:
+          run:
+            working-directory: infra/
+    env:
+      DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+    steps:
+      - name: Checking out the code...
+        uses: actions/checkout@v4
+      - name: Setting up Terraform...
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.0"
+      - name: Initializing project...
+        run: terraform init
+      - name: Formatting and validating...
+        run: terraform fmt && terraform validate
+      - name: Applying...
+        run: terraform apply -input=false --auto-approve
