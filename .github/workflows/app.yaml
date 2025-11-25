@@ -46,6 +46,16 @@ jobs:
     steps:
       - name: Checking out the code...
         uses: actions/checkout@v4
+      - name: Copying docker compose to server...
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY_DO }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          source: "app/docker-compose.yaml"
+          target: "/root/pyron-app"
+          strip_components: 1
       - name: Execute remote SSH commands using SSH key
         uses: appleboy/ssh-action@v1
         with:
