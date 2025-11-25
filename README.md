@@ -1,5 +1,7 @@
 # Pyron Infra
 
+[Live API](https://pyron.alwa.ai/docs)
+
 This repository contains the infrastructure and application code for **Pyron**, a trading signal processing system. It includes Terraform configurations for provisioning resources on DigitalOcean and a FastAPI application for handling signals.
 
 ## Architecture
@@ -25,6 +27,8 @@ The infrastructure is managed using **Terraform** and includes:
     -   `443` (HTTPS)
 -   **Container Registry**: Stores the Docker images for the API and Worker.
 -   **Terraform Backend**: State is stored in a DigitalOcean Space (S3-compatible) for collaboration and safety.
+    -   **Why Remote State?**: Storing the Terraform state file (`terraform.tfstate`) remotely ensures that all team members (and CI/CD pipelines) are working with the same view of the infrastructure. It prevents conflicts and data loss that can occur with local state files.
+    -   **DigitalOcean Spaces**: We use DigitalOcean Spaces as the backend because it is S3-compatible, reliable, and integrates well with the rest of the stack.
 
 ### Terraform Configuration
 
@@ -85,8 +89,8 @@ To use the CI/CD pipelines, you must configure the following **GitHub Secrets**:
 | Secret Name | Description |
 | :--- | :--- |
 | `DIGITALOCEAN_TOKEN` | API Token for DigitalOcean. Permissions: all(droplet,registry,firewall), read/write(spaces), read(region). |
-| `AWS_ACCESS_KEY_ID` | Access Key for the Spaces Object Storage (Terraform Backend). |
-| `AWS_SECRET_ACCESS_KEY` | Secret Key for the Spaces Object Storage. |
+| `AWS_ACCESS_KEY_ID` | **Access Key for the DigitalOcean Space**. Although named `AWS_...` (due to S3 compatibility), this is your DigitalOcean Spaces Access Key. |
+| `AWS_SECRET_ACCESS_KEY` | **Secret Key for the DigitalOcean Space**. This is your DigitalOcean Spaces Secret Key. |
 | `HOST` | IP Address of the Droplet (for deployment). |
 | `USERNAME` | SSH Username (root). |
 | `SSH_KEY_DO` | Private SSH Key for accessing the Droplet. |
@@ -123,7 +127,6 @@ To run the application locally:
     ```
 
 ### Load Testing
-
 
 #### Run Load Test
 1.  **Prerequisites**: k6.
