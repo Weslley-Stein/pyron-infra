@@ -42,4 +42,5 @@ jobs:
         run: doctl registry login
       - name: Tagging and Pushing...
         run: | 
+          docker images
           docker push registry.digitalocean.com/pyron-api-lon1/pyron-api:${{ github.sha }}
