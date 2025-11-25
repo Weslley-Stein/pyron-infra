@@ -67,14 +67,24 @@ DOMAIN_RESOLVES=false
 
 if [ -n "$HOSTNAME" ]; then
     echo "HOSTNAME is set to $HOSTNAME."
-    RESOLVED_IP=$(dig +short "$HOSTNAME" | tail -n1)
-    echo "Resolved IP for $HOSTNAME: $RESOLVED_IP"
+    # Get the last resolved IP and trim whitespace
+    RESOLVED_IP=$(dig +short "$HOSTNAME" | tail -n1 | xargs)
+    PUBLIC_IP=$(echo "$PUBLIC_IP" | xargs)
+    
+    echo "Resolved IP for $HOSTNAME: '$RESOLVED_IP'"
+    echo "Public IP: '$PUBLIC_IP'"
     
     if [ "$RESOLVED_IP" == "$PUBLIC_IP" ]; then
         echo "DNS matches Public IP. Proceeding with Certbot..."
         DOMAIN_RESOLVES=true
+        # Force cleanup of self-signed certs to ensure we don't get stuck
+        if [ -f "/etc/nginx/ssl/selfsigned.crt" ]; then
+            echo "Removing existing self-signed certificate..."
+            rm -f /etc/nginx/ssl/selfsigned.crt
+            rm -f /etc/nginx/ssl/selfsigned.key
+        fi
     else
-        echo "WARNING: DNS ($RESOLVED_IP) does not match Public IP ($PUBLIC_IP). Falling back to Self-Signed Certificate."
+        echo "WARNING: DNS ('$RESOLVED_IP') does not match Public IP ('$PUBLIC_IP'). Falling back to Self-Signed Certificate."
     fi
 fi
 
@@ -82,6 +92,10 @@ if [ "$DOMAIN_RESOLVES" = true ]; then
     echo "Configuring for domain $HOSTNAME..."
     
     NGINX_CONFIG="/etc/nginx/sites-available/$HOSTNAME"
+
+    # Remove default config to prevent conflicts
+    rm -f /etc/nginx/sites-enabled/default
+    rm -f /etc/nginx/sites-available/default
 
     cat > "$NGINX_CONFIG" <<EOF
 server {
@@ -98,7 +112,6 @@ server {
 }
 EOF
     ln -sf "$NGINX_CONFIG" "/etc/nginx/sites-enabled/$HOSTNAME"
-    rm -f /etc/nginx/sites-enabled/default
     
     nginx -t && systemctl reload nginx
 
@@ -198,6 +211,9 @@ EOF
         
         # Cleanup self-signed if it exists
         rm -f /etc/nginx/sites-enabled/default
+        rm -f /etc/nginx/sites-available/default
+        rm -f /etc/nginx/ssl/selfsigned.crt
+        rm -f /etc/nginx/ssl/selfsigned.key
     else
         echo "Certbot failed. Keeping previous configuration."
     fi
