@@ -1,6 +1,6 @@
 services:
   app:
-    image: registry.digitalocean.com/pyron-api-lon1:${TAG}
+    image: registry.digitalocean.com/pyron-api-lon1/pyron-api:${TAG}
     container_name: pyron_api
     restart: always
     ports:
