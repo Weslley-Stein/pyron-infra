@@ -28,15 +28,29 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.14.0"
+      - name: Setting up S3cmd cli tool
+        uses: s3-actions/s3cmd@v2.0.1
+        with:
+          provider: digitalocean
+          access_key: ${{ secrets.SPACES_ACCESS_KEY }}
+          secret_key: ${{ secrets.SPACES_SECRET_KEY }}
       - name: Initializing project...
         run: terraform init
       - name: Formatting and validating...
         run: terraform fmt && terraform validate
       - name: Planning...
         run: terraform plan -input=false -out tfplan
-      - name: Printing plan...
+      - name: Print Plan
         id: print_plan
-        run: terraform show tfplan >> $"GITHUB_OUTPUT"
+        run: |
+          PLAN_OUTPUT=$(terraform show -no-color tfplan)
+          echo "stdout<<EOF" >> $GITHUB_OUTPUT
+          echo "$PLAN_OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "$PLAN_OUTPUT"
+      - name: Pushing tfplan to space...
+        run: s3cmd put tfplan s3://pyron-terraform/tfplan
+
   apply:
     runs-on: ubuntu-latest
     if: ${{(github.event_name == 'push' && github.ref_name == 'master') || github.event_name == 'workflow_dispatch' }}
@@ -48,13 +62,23 @@ jobs:
     steps:
       - name: Checking out the code...
         uses: actions/checkout@v4
+      - name: Setting up S3cmd cli tool
+        uses: s3-actions/s3cmd@v2.0.1
+        with:
+          provider: digitalocean
+          access_key: ${{ secrets.SPACES_ACCESS_KEY }}
+          secret_key: ${{ secrets.SPACES_SECRET_KEY }}
       - name: Setting up Terraform...
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.14.0"
+      - name: Pulling tfplan and terraform.tfstate to space...
+        run: s3cmd get s3://pyron-terraform/ --recursive
       - name: Initializing project...
         run: terraform init
       - name: Formatting and validating...
         run: terraform fmt && terraform validate
       - name: Applying...
-        run: terraform apply -input=false --auto-approve
+        run: terraform apply -input=false --auto-approve tfplan
+      - name: Pushing terraform.state to space...
+        run: s3cmd put terraform.tfstate s3://pyron-terraform/terraform.tfstate
