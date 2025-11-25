@@ -25,7 +25,7 @@ echo "Starting deployment script..."
 
 echo "Updating packages..."
 apt update -y && apt upgrade -y
-apt install -y docker.io nginx certbot python3-certbot-nginx dnsutils
+apt install -y docker.io docker-compose nginx certbot python3-certbot-nginx dnsutils
 
 echo "Enabling services..."
 systemctl enable --now docker
